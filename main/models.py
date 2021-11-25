@@ -16,7 +16,7 @@ class Discussion(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='discussions')
     title = models.CharField(max_length=300)
     text = models.TextField()
-    created = models.DateTimeField()
+    created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title
@@ -25,3 +25,19 @@ class Discussion(models.Model):
 class Image(models.Model):
     image = models.ImageField(upload_to='discussions', blank=True, null=True)
     discussion = models.ForeignKey(Discussion, on_delete=models.CASCADE, related_name='images')
+
+    def _get_image_url(self, obj):
+        if obj.image:
+            url = obj.image.url
+            request = self.context.get('request')
+            if request is not None:
+                url = request.built_absolute_uri(url)
+        else:
+            url = ''
+        return url
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['image'] = self._get_image_url(instance)
+        return representation
+
