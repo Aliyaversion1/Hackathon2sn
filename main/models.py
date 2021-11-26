@@ -41,3 +41,13 @@ class Image(models.Model):
         representation['image'] = self._get_image_url(instance)
         return representation
 
+
+class Comment(models.Model):
+    user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
+    discussion = models.ForeignKey(Discussion, on_delete=models.CASCADE, related_name='comments')
+    comment = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+    moderator = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f'{self.user} {self.discussion}'
