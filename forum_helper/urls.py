@@ -23,6 +23,7 @@ from main.views import *
 
 router = DefaultRouter()
 router.register('discussions', DiscussionsViewSet)
+router.register('comments', CommentView)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -30,6 +31,5 @@ urlpatterns = [
     path('v1/api/categories/', CategoryListView.as_view()),
     path('v1/api/add_image/', ImageView.as_view()),
     path('v1/api/account/', include('account.urls')),
-    path('v1/api/discussion/<int:pk>/comment/', CommentView.as_view()),
     path('v1/api/', include(router.urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
