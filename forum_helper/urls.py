@@ -19,15 +19,17 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from main.views import CategoryListView, DiscussionsViewSet, ImageView
+from main.views import *
 
 router = DefaultRouter()
 router.register('discussions', DiscussionsViewSet)
+router.register('comments', CommentView)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('v1/api/categories/', CategoryListView.as_view()),
     path('v1/api/add_image/', ImageView.as_view()),
+    path('v1/api/account/', include('account.urls')),
     path('v1/api/', include(router.urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

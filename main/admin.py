@@ -13,3 +13,4 @@ class DiscussionAdmin(admin.ModelAdmin):
     inlines = [DiscussionImageInLine, ]
 
 admin.site.register(Category)
+admin.site.register(Comment)
