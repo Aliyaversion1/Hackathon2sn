@@ -8,7 +8,7 @@ class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
-        return self.name
+        return f'{self.name}'
 
 
 class Discussion(models.Model):
@@ -19,7 +19,7 @@ class Discussion(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.title
+        return f'{self.title}'
 
 
 class Image(models.Model):
@@ -42,12 +42,50 @@ class Image(models.Model):
         return representation
 
 
+class Reply(models.Model):
+    author = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='replies')
+    discussion = models.ForeignKey(Discussion, on_delete=models.CASCADE, related_name='replies')
+    body = models.TextField()
+    image = models.ImageField(blank=True, null=True, upload_to='replies')
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.author}: {self.body[:15]}'
+
+
 class Comment(models.Model):
-    user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
+    author = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='comments')
     discussion = models.ForeignKey(Discussion, on_delete=models.CASCADE, related_name='comments')
     comment = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
     moderator = models.BooleanField(default=True)
 
     def __str__(self):
-        return f'{self.user} {self.discussion}'
+        return f'{self.user} {self.comment}'
+
+
+class Favorites(models.Model):
+    user = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='favorites')
+    discussion = models.ForeignKey(Discussion, on_delete=models.CASCADE, related_name='favorites')
+    favorites = models.BooleanField(default=False)
+
+    def __str__(self):
+        return {self.discussion}
+
+
+class Rating(models.Model):
+    author = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='rating')
+    discussion = models.ForeignKey(Discussion, on_delete=models.CASCADE, related_name='rating')
+    rating = models.PositiveIntegerField(default=0, null=True, blank=True)
+
+    def __str__(self):
+        return str(self.rating)
+
+
+class Likes(models.Model):
+    author = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='likes')
+    discussion = models.ForeignKey(Discussion, on_delete=models.CASCADE, related_name='likes')
+    likes = models.BooleanField(default=False)
+
+    def __str__(self):
+        return {self.discussion}

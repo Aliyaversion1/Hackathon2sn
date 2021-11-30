@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from account.serializers import *
+from account.utils import send_reset_activation_code
 
 
 class RegisterView(APIView):
@@ -34,10 +35,32 @@ class LoginView(ObtainAuthToken):
 
 
 class LogoutView(APIView):
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         user = request.user
         Token.objects.filter(user=user).delete()
         return Response('Successfully logged uot', status=status.HTTP_200_OK)
+
+
+class ResetPassword(APIView):
+    def get(self, request):
+        email = request.query_params.get('email')
+        try:
+            user = MyUser.objects.get(email=email)
+            user.is_active = False
+            user.create_activation_code()
+            user.save()
+            send_reset_activation_code(user)
+            return Response('Check your email, please', status=200)
+        except MyUser.DoesNotExist:
+            return Response({'msg': 'User doesnt exist'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ResetComplete(APIView):
+    def post(self, request):
+        serializer = CreateNewPasswordSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response('Password changed successfully', status=200)
 

@@ -3,3 +3,7 @@ psycopg2-binary
 Pillow
 djangorestframework
 python-decouple
+django-filter
+drf-yasg
+celery
+redis
